@@ -5,19 +5,24 @@ public class AtesSistemi : MonoBehaviour
 {
     Camera kamera;
     public LayerMask zombiKatman;
+    KarakterKontrol hpcontrol;
     void Start()
     {
         kamera = Camera.main;
-
+        hpcontrol = this.gameObject.GetComponent<KarakterKontrol>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (hpcontrol.isAliveControl() == true)
         {
-            AtesEtme();
+            if (Input.GetMouseButton(0))
+            {
+                AtesEtme();
+            }
         }
+        
     }
     void AtesEtme()
     {
