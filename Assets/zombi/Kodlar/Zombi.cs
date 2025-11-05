@@ -13,12 +13,22 @@ public class Zombi : MonoBehaviour
     public float saldirmaMesafesi;
     float mesafe;
     NavMeshAgent zombiNav;
-
     GameObject hedefOyuncu;
 
-    // --- YENÝ DEVRÝYE DEÐÝÞKENLERÝ ---
-    public Transform[] patrolPoints; // Devriye noktalarýný buraya atayacaðýz
-    private int currentPatrolIndex; // Hangi noktaya gittiðimizi tutar
+    // --- YENÝ SES SÝSTEMÝ (ÝKÝ KAYNAKLI) ---
+    // BU ALANLARI UNITY INSPECTOR'DAN ATAMAN GEREKÝYOR!
+    public AudioSource audioSource_Ambient; // Hýrýltý (Growl) sesini çalan kaynak
+    public AudioSource audioSource_Actions; // Adým, Saldýrý, Ölüm seslerini çalan kaynak
+
+    // Bu sesler Animasyon Olaylarý (Animation Events) için
+    public AudioClip attackingSound;
+    public AudioClip dyingSound;
+    // Not: Yürüme ve hýrýltý sesleri için deðiþkene gerek yok,
+    // çünkü onlarý doðrudan Inspector'daki AudioSource'lara atamýþsýn (görselde görünüyor).
+    // --- BÝTTÝ ---
+
+    public Transform[] patrolPoints;
+    private int currentPatrolIndex;
 
     void Start()
     {
@@ -26,94 +36,169 @@ public class Zombi : MonoBehaviour
         hedefOyuncu = GameObject.FindGameObjectWithTag("SWAT");
         zombiNav = this.GetComponent<NavMeshAgent>();
 
-        // Devriyeye ilk noktadan baþla
+        // --- DEÐÝÞTÝ ---
+        // Eski 'audioSource = this.GetComponent<AudioSource>();' satýrýný sildik.
+        // Artýk iki kaynaðý da Inspector'dan atadýðýný varsayýyoruz.
+
+        // Görseldeki 'Play On Awake' ayarýna göre:
+        // Hýrýltý (Ambient) zaten kendi çalmaya baþlar.
+        // Adým sesleri (Actions) de çalmaya baþlar, ama duruma göre durdurmamýz gerekebilir.
+
         if (patrolPoints != null && patrolPoints.Length > 0)
         {
             currentPatrolIndex = 0;
             zombiNav.SetDestination(patrolPoints[currentPatrolIndex].position);
-            zombiAnim.SetBool("isWalking", true); // Yürümeye baþla
+            zombiAnim.SetBool("isWalking", true);
+            // Yürüyerek baþladýðý için adým sesleri çalmalý
+            if (audioSource_Actions != null && !audioSource_Actions.isPlaying)
+                audioSource_Actions.Play();
+        }
+        else
+        {
+            // Devriye yoksa, boþta durur. Adým sesleri susmalý.
+            zombiAnim.SetBool("isWalking", false);
+            if (audioSource_Actions != null && audioSource_Actions.isPlaying)
+                audioSource_Actions.Stop();
         }
     }
 
-    // Update'i daha net bir Durum Makinesi (State Machine) gibi yeniden düzenledim
     void Update()
     {
         // --- 1. DURUM: ÖLÜM (En Yüksek Öncelik) ---
-        if (zombiHP <= 0)
-        {
-            zombiOlu = true;
-        }
 
-        if (zombiOlu == true)
+        // --- GÜNCELLENDÝ: ÝSTEDÝÐÝN ÖLÜM MANTIÐI ---
+        // Bu blok, ölümün *sadece ilk karesinde* çalýþýr.
+        if (zombiHP <= 0 && zombiOlu == false)
         {
+            zombiOlu = true; // Durumu 'ölü' olarak ayarla
+
+            // --- ÝSTEÐÝN: BÜTÜN SESLERÝN SUSMASI ---
+            if (audioSource_Ambient != null && audioSource_Ambient.isPlaying)
+            {
+                audioSource_Ambient.Stop(); // Hýrýltýyý (loop) durdur
+            }
+            if (audioSource_Actions != null && audioSource_Actions.isPlaying)
+            {
+                audioSource_Actions.Stop(); // Adým seslerini (loop) durdur
+            }
+            // -----------------------------------------
+
+            // Ölüm sesi Animasyon Olayý'ndan (zombiOlduSes) çalýnacak,
+            // o yüzden burada ÇALMIYORUZ. Sadece animasyonu tetikliyoruz.
+
             zombiAnim.SetBool("isDead", true);
             zombiAnim.SetBool("isAttacking", false);
             zombiAnim.SetBool("isRunning", false);
-            zombiAnim.SetBool("isWalking", false); // Yürümeyi de durdur
+            zombiAnim.SetBool("isWalking", false);
             zombiNav.isStopped = true;
             StartCoroutine(YokOl());
-            return; // Ölüyse baþka bir kod çalýþtýrma
         }
+
+        // Zombi öldüyse, Update'in geri kalanýný çalýþtýrma.
+        if (zombiOlu == true)
+        {
+            return;
+        }
+        // --- ÖLÜM MANTIÐI BÝTTÝ ---
+
 
         // --- Zombi hayattaysa ---
         mesafe = Vector3.Distance(hedefOyuncu.transform.position, this.transform.position);
 
-        // --- 2. DURUM: SALDIRI (Yüksek Öncelik) ---
-        // Oyuncu saldýrý mesafesindeyse, baþka bir þey yapma, saldýr.
-        if (mesafe <= saldirmaMesafesi)
+        // --- BÖLÜM 1: DURUM (STATE) BELÝRLEME (Önceki cevaptaki gibi) ---
+        if (mesafe <= kovalamaMesafesi)
         {
-            zombiNav.isStopped = true; // Dur ve saldýr
-            this.transform.LookAt(hedefOyuncu.transform.position); // Yüzün oyuncuya dönsün
-
-            zombiAnim.SetBool("isAttacking", true);
-            zombiAnim.SetBool("isRunning", false);
-            zombiAnim.SetBool("isWalking", false);
+            if (mesafe < saldirmaMesafesi)
+            {
+                // DURUM: SALDIRI
+                this.transform.LookAt(hedefOyuncu.transform.position);
+                zombiNav.isStopped = true;
+                zombiAnim.SetBool("isAttacking", true);
+                zombiAnim.SetBool("isRunning", false);
+                zombiAnim.SetBool("isWalking", false);
+            }
+            else
+            {
+                // DURUM: KOVALAMA (Running)
+                zombiNav.isStopped = false;
+                zombiNav.SetDestination(hedefOyuncu.transform.position);
+                this.transform.LookAt(hedefOyuncu.transform.position);
+                zombiAnim.SetBool("isRunning", true);
+                zombiAnim.SetBool("isAttacking", false);
+                zombiAnim.SetBool("isWalking", false);
+            }
         }
-        // --- 3. DURUM: KOVALAMA (Orta Öncelik) ---
-        // Oyuncu saldýrý mesafesinde deðil AMA kovalama mesafesindeyse, kovala.
-        else if (mesafe <= kovalamaMesafesi)
-        {
-            zombiNav.isStopped = false; // Kovalamak için hareket et
-            zombiNav.SetDestination(hedefOyuncu.transform.position);
-            this.transform.LookAt(hedefOyuncu.transform.position); // Kovalamada da baksýn
-
-            zombiAnim.SetBool("isRunning", true);
-            zombiAnim.SetBool("isAttacking", false);
-            zombiAnim.SetBool("isWalking", false);
-        }
-        // --- 4. DURUM: DEVRÝYE (Düþük Öncelik) ---
-        // Oyuncu menzilde deðilse, devriye gez.
         else
         {
-            // Kovalamayý ve saldýrmayý býrak
+            // Oyuncu menzil dýþýnda
             zombiAnim.SetBool("isRunning", false);
             zombiAnim.SetBool("isAttacking", false);
 
-            // Devriye noktalarý atanmýþ mý kontrol et
             if (patrolPoints != null && patrolPoints.Length > 0)
             {
+                // DURUM: DEVRÝYE (Walking)
                 zombiNav.isStopped = false;
-                zombiAnim.SetBool("isWalking", true); // Yürüme animasyonu
+                zombiAnim.SetBool("isWalking", true);
 
-                // NavMeshAgent'ýn hedefe ulaþýp ulaþmadýðýný kontrol et
-                // pathPending: Agent'ýn hala bir yol hesaplamaya çalýþmadýðýndan emin ol
-                // remainingDistance: Hedefe kalan mesafe
-                // stoppingDistance: Hedefe ne kadar yaklaþýnca duracaðý (Inspector'dan ayarlanýr)
                 if (!zombiNav.pathPending && zombiNav.remainingDistance <= zombiNav.stoppingDistance)
                 {
-                    // Hedefe ulaþtýk, bir sonraki devriye noktasýna geç
                     currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
                     zombiNav.SetDestination(patrolPoints[currentPatrolIndex].position);
                 }
             }
             else
             {
-                // Devriye noktasý yoksa, dur (senin orijinal kodundaki gibi)
+                // DURUM: IDLE (Boþta Durma)
                 zombiNav.isStopped = true;
                 zombiAnim.SetBool("isWalking", false);
             }
         }
+
+        // --- BÖLÜM 2: SES (AUDIO) YÖNETÝMÝ (Önceki cevaptaki gibi) ---
+        // 'audioSource_Actions' (Adým Sesi) döngüsünü yönetir.
+        if (audioSource_Actions != null)
+        {
+            // Zombi YÜRÜYOR veya KOÞUYORSA
+            if (zombiAnim.GetBool("isRunning") || zombiAnim.GetBool("isWalking"))
+            {
+                // Adým sesi çalmýyorsa, baþlat
+                if (!audioSource_Actions.isPlaying)
+                {
+                    audioSource_Actions.Play();
+                }
+            }
+            // Zombi SALDIRIYOR veya DURUYORSA (hareket etmiyorsa)
+            else
+            {
+                // Adým sesi çalýyorsa, durdur
+                if (audioSource_Actions.isPlaying)
+                {
+                    audioSource_Actions.Stop();
+                }
+            }
+        }
     }
+
+    // --- GÜNCELLENDÝ: ÖLÜM SESÝ OLAYI ---
+    public void zombiOlduSes()
+    {
+ 
+            audioSource_Actions.PlayOneShot(dyingSound);
+        
+    }
+    // --- BÝTTÝ ---
+
+    // --- GÜNCELLENDÝ: SALDIRI SESÝ OLAYI ---
+    public void hasarVerSes()
+    {
+        if (!audioSource_Actions.isPlaying)
+        {
+            audioSource_Actions.Play();
+        }
+        audioSource_Actions.PlayOneShot(attackingSound);
+
+    }
+    // --- BÝTTÝ ---
 
     public void hasarVer()
     {
