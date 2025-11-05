@@ -20,6 +20,7 @@ public class KarakterKontrol : MonoBehaviour
         if (hp <= 0)
         {
             isAlive = false;
+            anim.SetBool("isAlive", isAlive);
         }
         if(isAlive == true) { Hareket(); }
         

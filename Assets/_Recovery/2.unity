@@ -200,7 +200,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Zombi
   zombiHP: 100
   kovalamaMesafesi: 15
-  saldirmaMesafesi: 4
+  saldirmaMesafesi: 2.4
   patrolPoints:
   - {fileID: 264077494}
   - {fileID: 1521831372}
