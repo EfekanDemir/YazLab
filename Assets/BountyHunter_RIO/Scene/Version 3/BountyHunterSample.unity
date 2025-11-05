@@ -416,11 +416,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 87779ffa40218e8488b67abf488ea8a3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.08
+      value: 9.8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 87779ffa40218e8488b67abf488ea8a3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.87
+      value: -22.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 87779ffa40218e8488b67abf488ea8a3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -849,7 +849,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AtesSistemi
   zombiKatman:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
 --- !u!1 &1494048979
 GameObject:
   m_ObjectHideFlags: 0
