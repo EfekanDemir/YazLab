@@ -54,12 +54,13 @@
     <Compile Include="Assets\Karakter\kodlar\KarakterKontrol.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Karakter\kodlar\KameraKontrol.cs" />
+    <Compile Include="Assets\Huseyin\HousePlacer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Free Low Poly Desert Pack\Materials\Shaders\Vertex_Color_Unlit.shader" />
-    <None Include="Assets\Free Low Poly Desert Pack\Materials\Shaders\Vertex_Color_Basic.shader" />
+    <None Include="Assets\PolyRonin\Free Low Poly Desert Pack\Materials\Shaders\Vertex_Color_Unlit.shader" />
+    <None Include="Assets\PolyRonin\Free Low Poly Desert Pack\Materials\Shaders\Vertex_Color_Basic.shader" />
     <None Include="Assets\Tiny Teacup Studio\Low Poly Desert Environment\LICENSE.txt" />
-    <None Include="Assets\Free Low Poly Desert Pack\Materials\Shaders\Water_Low_Poly_Basic.shader" />
+    <None Include="Assets\PolyRonin\Free Low Poly Desert Pack\Materials\Shaders\Water_Low_Poly_Basic.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
