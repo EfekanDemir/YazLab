@@ -399,6 +399,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: desert-village-1
       objectReference: {fileID: 0}
+    - target: {fileID: 2024409434528254652, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 2024409434528254652, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -19.3
+      objectReference: {fileID: 0}
     - target: {fileID: 2880953033597276349, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
       propertyPath: m_Convex
       value: 1
