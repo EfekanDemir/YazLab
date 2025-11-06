@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Assets\zombi\Kodlar\Zombi.cs" />
     <Compile Include="Assets\Karakter\kodlar\AtesSistemi.cs" />
+    <Compile Include="Assets\Huseyin\CactusPlacer.cs" />
     <Compile Include="Assets\Karakter\kodlar\KarakterKontrol.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Karakter\kodlar\KameraKontrol.cs" />
