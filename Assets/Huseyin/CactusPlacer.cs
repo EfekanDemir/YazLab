@@ -8,7 +8,7 @@ public class CactusPlacer : MonoBehaviour
     public GameObject[] cactusPrefabs; // Birden fazla prefab için dizi
 
     [Header("Harita Alanı")]
-    public Vector2 mapSize = new Vector2(500, 500); // Alanı genişlettik
+    public Vector2 mapSize = new Vector2(660, 660); // 8x8'lik alanı kapsayacak şekilde güncellendi
 
     // Script'in eklendiği nesnenin pozisyonunu merkez alır.
     // Haritanızın merkezi (0,0,0) değilse bu nesneyi merkeze taşıyın.
