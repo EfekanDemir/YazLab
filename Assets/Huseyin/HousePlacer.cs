@@ -9,6 +9,8 @@ public class HousePlacer : MonoBehaviour
 
     [Header("Harita Alanı")]
     public Vector2 mapSize = new Vector2(500, 500);
+    [Tooltip("Haritanın kenarlarından ne kadar boşluk bırakılacağı.")]
+    public float borderPadding = 20f;
 
     [Header("Zemin Kontrolü")]
     [Tooltip("Bir evin yerleşebileceği maksimum zemin eğim açısı.")]
@@ -45,9 +47,14 @@ public class HousePlacer : MonoBehaviour
             bool spotFound = false;
             for (int attempt = 0; attempt < placementAttempts; attempt++)
             {
-                // Rastgele bir konum seç
-                float randomX = Random.Range(-mapSize.x / 2, mapSize.x / 2);
-                float randomZ = Random.Range(-mapSize.y / 2, mapSize.y / 2);
+                // Kenar boşluklarını hesaba katarak rastgele bir konum seç
+                float minX = (-mapSize.x / 2) + borderPadding;
+                float maxX = (mapSize.x / 2) - borderPadding;
+                float minZ = (-mapSize.y / 2) + borderPadding;
+                float maxZ = (mapSize.y / 2) - borderPadding;
+
+                float randomX = Random.Range(minX, maxX);
+                float randomZ = Random.Range(minZ, maxZ);
                 Vector3 spawnPosition = new Vector3(centerPosition.x + randomX, centerPosition.y + 100f, centerPosition.z + randomZ);
 
                 RaycastHit hit;
