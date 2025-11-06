@@ -10,10 +10,11 @@ public class NewMonoBehaviourScript : MonoBehaviour
 
     Vector3 objRot;
     public Transform karakterVucut;
-
+    KarakterKontrol karakterHp;
 
     void Start()
     {
+       
         Cursor.lockState = CursorLockMode.Locked;
     }
 
