@@ -50,11 +50,10 @@
   <ItemGroup>
     <Compile Include="Assets\zombi\Kodlar\Zombi.cs" />
     <Compile Include="Assets\Karakter\kodlar\AtesSistemi.cs" />
-    <Compile Include="Assets\Huseyin\CactusPlacer.cs" />
+    <Compile Include="Assets\BountyHunter_RIO\Scene\Huseyin\CactusPlacer.cs" />
     <Compile Include="Assets\Karakter\kodlar\KarakterKontrol.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Karakter\kodlar\KameraKontrol.cs" />
-    <Compile Include="Assets\Huseyin\HousePlacer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\PolyRonin\Free Low Poly Desert Pack\Materials\Shaders\Vertex_Color_Unlit.shader" />
