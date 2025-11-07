@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_RandomDir.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_Demo_RotateCamera.cs" />
+    <Compile Include="Assets\Kullanıcı Arayüz\Scripts\ArayuzKontrol.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Scripts\CFX_LightIntensityFade.cs" />
     <Compile Include="Assets\zombi\Kodlar\Zombi.cs" />
     <Compile Include="Assets\Karakter\kodlar\AtesSistemi.cs" />
@@ -97,6 +98,7 @@
     <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Smoke Scroll.shader" />
     <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Particle Multiply A8.shader" />
     <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S AlphaBlend Scroll.shader" />
+    <None Include="Assets\Kullanıcı Arayüz\Fonts\OFL.txt" />
     <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Particle AddSoft A8.shader" />
     <None Include="Assets\JMO Assets\WarFX\!WarFX Readme.txt" />
     <None Include="Assets\PolyRonin\Free Low Poly Desert Pack\Materials\Shaders\Water_Low_Poly_Basic.shader" />
