@@ -12,8 +12,8 @@ public class Zombi : MonoBehaviour
     public float kovalamaMesafesi;
     public float saldirmaMesafesi;
     float mesafe;
-    NavMeshAgent zombiNav;
-    GameObject hedefOyuncu;
+    public NavMeshAgent zombiNav;
+    public GameObject hedefOyuncu;
 
     // --- YENÝ SES SÝSTEMÝ (ÝKÝ KAYNAKLI) ---
     // BU ALANLARI UNITY INSPECTOR'DAN ATAMAN GEREKÝYOR!
