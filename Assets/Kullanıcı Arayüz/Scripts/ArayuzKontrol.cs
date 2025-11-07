@@ -1,16 +1,23 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class ArayuzKontrol : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Text mermiText;
+    public Text saglikText;
+
+    GameObject oyuncu;
     void Start()
     {
-        
+        oyuncu = GameObject.FindWithTag("SWAT");
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
-        
+        mermiText.text = "Mermi: " + oyuncu.GetComponent<AtesSistemi>().GetSarjor().ToString()+"/"+ oyuncu.GetComponent<AtesSistemi>().GetCephane().ToString();
+        saglikText.text = "HP= " + oyuncu.GetComponent<KarakterKontrol>().GetSaglik();
     }
 }

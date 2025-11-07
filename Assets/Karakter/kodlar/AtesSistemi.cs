@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+
 public class AtesSistemi : MonoBehaviour
 {
     Camera kamera;
@@ -9,10 +10,14 @@ public class AtesSistemi : MonoBehaviour
     public ParticleSystem muzzleFlash;
     Animator anim;
 
+    private float sarjor = 50;
+    private float cephane = 300;
+    private float sarjorKapasitesi = 50;
 
-    private float sarjor = 100;
-    private float cephane = 500;
-    private float sarjorKapasitesi = 100;
+    [Header("Ateþ Etme Ayarlarý")]
+    public float atesEtmeAraligi = 0.1f;
+    private float sonrakiAtesZamani = 0f;
+
     void Start()
     {
         kamera = Camera.main;
@@ -20,33 +25,32 @@ public class AtesSistemi : MonoBehaviour
         anim = this.gameObject.GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (hpcontrol.isAliveControl() == true)
         {
             if (Input.GetMouseButton(0))
             {
-                if (sarjor > 0)
+                if (sarjor > 0 && Time.time >= sonrakiAtesZamani)
                 {
+                    sonrakiAtesZamani = Time.time + atesEtmeAraligi;
+
                     anim.SetBool("AtesEt", true);
                     AtesEtme();
                 }
-                if (sarjor<=0)
+                else if (sarjor <= 0 && cephane > 0)
                 {
                     anim.SetBool("AtesEt", false);
-                }
-                if (sarjor <= 0 && cephane > 0)
-                {
                     anim.SetBool("sarjorDegistirme", true);
-
-                    
+                }
+                else if (sarjor <= 0)
+                {
+                    anim.SetBool("AtesEt", false);
                 }
             }
             else if (Input.GetMouseButtonUp(0))
             {
                 anim.SetBool("AtesEt", false);
-                
             }
         }
     }
@@ -54,11 +58,10 @@ public class AtesSistemi : MonoBehaviour
     {
         cephane -= sarjorKapasitesi - sarjor;
         sarjor = sarjorKapasitesi;
-        anim.SetBool("sarjorDegistirme", false );
+        anim.SetBool("sarjorDegistirme", false);
     }
     public void AtesEtme()
     {
-
         sarjor--;
         muzzleFlash.Emit(10);
         Ray ray = kamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -67,6 +70,14 @@ public class AtesSistemi : MonoBehaviour
         {
             hit.collider.gameObject.GetComponent<Zombi>().HasarAl();
         }
-        
+    }
+
+    public float GetSarjor()
+    {
+        return sarjor;
+    }
+    public float GetCephane()
+    {
+        return cephane;
     }
 }
