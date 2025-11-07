@@ -657,11 +657,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3934716475655149349, guid: c5e08f340b1b9a744a660da3245ce3e9, type: 3}
       propertyPath: m_LocalPosition.x
-<<<<<<<< HEAD:Assets/BountyHunter_RIO/Scene/SON/BountyHunterSample.unity
-      value: -0.84
-========
       value: 1.6
->>>>>>>> emirhan:Assets/BountyHunter_RIO/Scene/7.11.2025 swat/BountyHunterSample.unity
       objectReference: {fileID: 0}
     - target: {fileID: 3934716475655149349, guid: c5e08f340b1b9a744a660da3245ce3e9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -669,11 +665,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3934716475655149349, guid: c5e08f340b1b9a744a660da3245ce3e9, type: 3}
       propertyPath: m_LocalPosition.z
-<<<<<<<< HEAD:Assets/BountyHunter_RIO/Scene/SON/BountyHunterSample.unity
-      value: -24.9
-========
       value: -33.4
->>>>>>>> emirhan:Assets/BountyHunter_RIO/Scene/7.11.2025 swat/BountyHunterSample.unity
       objectReference: {fileID: 0}
     - target: {fileID: 3934716475655149349, guid: c5e08f340b1b9a744a660da3245ce3e9, type: 3}
       propertyPath: m_LocalRotation.w

@@ -1,0 +1,634 @@
+================================================================================
+                    UNITY TPS ZOMBİ OYUNU - KAYNAK KODLAR
+================================================================================
+
+Bu dosya, Unity TPS Zombi Oyunu projesinde kullanılan tüm kaynak kodları içermektedir.
+Tarih: 2024
+Unity Versiyonu: 6000.2.10f1
+
+================================================================================
+1. ARAYÜZ KONTROL SCRIPTİ (ArayuzKontrol.cs)
+================================================================================
+Konum: Assets/Kullanıcı Arayüz/Scripts/ArayuzKontrol.cs
+
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
+
+public class ArayuzKontrol : MonoBehaviour
+{
+    public Text mermiText;
+    public Text saglikText;
+
+    GameObject oyuncu;
+    void Start()
+    {
+        oyuncu = GameObject.FindWithTag("SWAT");
+    }
+
+    
+    void Update()
+    {
+        mermiText.text = "Mermi: " + oyuncu.GetComponent<AtesSistemi>().GetSarjor().ToString()+"/"+ oyuncu.GetComponent<AtesSistemi>().GetCephane().ToString();
+        saglikText.text = "HP= " + oyuncu.GetComponent<KarakterKontrol>().GetSaglik();
+    }
+}
+
+================================================================================
+2. KARAKTER KONTROL SCRIPTİ (KarakterKontrol.cs)
+================================================================================
+Konum: Assets/Karakter/kodlar/KarakterKontrol.cs
+
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class KarakterKontrol : MonoBehaviour
+{
+    public float karakterHiz;
+    public float hp = 100;
+    bool isAlive;
+    Animator anim;
+    public float zıplamaGucu = 5f;
+    Rigidbody rb;
+
+    private Camera mainKamera;
+    public float normalFOV = 60f;
+    public float zoomFOV = 30f;
+
+    void Start()
+    {
+        anim = this.GetComponent<Animator>();
+        rb = this.GetComponent<Rigidbody>();
+        isAlive = true;
+
+        mainKamera = Camera.main;
+
+        if (mainKamera != null)
+        {
+            mainKamera.fieldOfView = normalFOV;
+        }
+    }
+
+    void Update()
+    {
+        if (hp <= 0)
+        {
+            isAlive = false;
+            anim.SetBool("isAlive", isAlive);
+        }
+
+        if (isAlive == true)
+        {
+            Hareket();
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                anim.SetTrigger("isJumping");
+                rb.AddForce(Vector3.up * zıplamaGucu, ForceMode.Impulse);
+            }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                bool suAnComeliyorMu = anim.GetBool("isCrouching");
+                anim.SetBool("isCrouching", !suAnComeliyorMu);
+            }
+
+            if (Input.GetMouseButton(1))
+            {
+                anim.SetBool("isAiming", true);
+
+                mainKamera.fieldOfView = zoomFOV;
+            }
+            else
+            {
+                anim.SetBool("isAiming", false);
+
+                mainKamera.fieldOfView = normalFOV;
+            }
+        }
+    }
+
+
+    public float GetSaglik()
+    {
+        return hp;
+    }
+
+    public bool isAliveControl()
+    {
+        return isAlive;
+    }
+
+    public void HasarAl()
+    {
+        hp -= Random.Range(5, 10);
+    }
+
+    void Hareket()
+    {
+        float yatay = Input.GetAxis("Horizontal");
+        float dikey = Input.GetAxis("Vertical");
+        anim.SetFloat("Horizontal", yatay);
+        anim.SetFloat("Vertical", dikey);
+        this.gameObject.transform.Translate(yatay * karakterHiz * Time.deltaTime, 0, dikey * karakterHiz * Time.deltaTime);
+    }
+}
+
+================================================================================
+3. KAMERA KONTROL SCRIPTİ (KameraKontrol.cs)
+================================================================================
+Konum: Assets/Karakter/kodlar/KameraKontrol.cs
+
+using UnityEngine;
+
+public class NewMonoBehaviourScript : MonoBehaviour
+{
+    public Transform hedef;
+    public Vector3 hedefMesafe;
+    [SerializeField]
+    private float fareHassasiyeti ;
+    float fareX, fareY;
+
+    Vector3 objRot;
+    public Transform karakterVucut;
+    KarakterKontrol karakterHp;
+
+    void Start()
+    {
+       
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    
+    void Update()
+    {
+        
+    } 
+    private void LateUpdate()
+    {
+        this.transform.position =Vector3.Lerp(this.transform.position,hedef.position+hedefMesafe, Time.deltaTime*10);
+        fareX += Input.GetAxis("Mouse X")*fareHassasiyeti;
+        fareY += Input.GetAxis("Mouse Y")*fareHassasiyeti;
+        if (fareY >=25)
+           {
+            fareY = 25;
+        }
+        if (fareY <= -40)
+        {
+            fareY = -40;
+        }
+
+        this.transform.eulerAngles = new Vector3(fareY, fareX, 0);
+        hedef.transform.eulerAngles = new Vector3(0, fareX, 0);
+
+        Vector3 gecici = this.transform.localEulerAngles;
+        gecici.z = 0;
+        gecici.y = 0;
+        gecici.x = this.transform.localEulerAngles.x+10;
+        objRot= gecici;
+        karakterVucut.localEulerAngles = objRot;
+
+    }
+}
+
+================================================================================
+4. ATEŞ SİSTEMİ SCRIPTİ (AtesSistemi.cs)
+================================================================================
+Konum: Assets/Karakter/kodlar/AtesSistemi.cs
+
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class AtesSistemi : MonoBehaviour
+{
+    Camera kamera;
+    public LayerMask zombiKatman;
+    KarakterKontrol hpcontrol;
+    public ParticleSystem muzzleFlash;
+    Animator anim;
+
+    private float sarjor = 50;
+    private float cephane = 300;
+    private float sarjorKapasitesi = 50;
+
+    [Header("Ateş Etme Ayarları")]
+    public float atesEtmeAraligi = 0.1f;
+    private float sonrakiAtesZamani = 0f;
+
+    void Start()
+    {
+        kamera = Camera.main;
+        hpcontrol = this.gameObject.GetComponent<KarakterKontrol>();
+        anim = this.gameObject.GetComponent<Animator>();
+    }
+
+    void Update()
+    {
+        if (hpcontrol.isAliveControl() == true)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                if (sarjor > 0 && Time.time >= sonrakiAtesZamani)
+                {
+                    sonrakiAtesZamani = Time.time + atesEtmeAraligi;
+
+                    anim.SetBool("AtesEt", true);
+                    AtesEtme();
+                }
+                else if (sarjor <= 0 && cephane > 0)
+                {
+                    anim.SetBool("AtesEt", false);
+                    anim.SetBool("sarjorDegistirme", true);
+                }
+                else if (sarjor <= 0)
+                {
+                    anim.SetBool("AtesEt", false);
+                }
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                anim.SetBool("AtesEt", false);
+            }
+        }
+    }
+    public void SarjorDegistirme()
+    {
+        cephane -= sarjorKapasitesi - sarjor;
+        sarjor = sarjorKapasitesi;
+        anim.SetBool("sarjorDegistirme", false);
+    }
+    public void AtesEtme()
+    {
+        sarjor--;
+        muzzleFlash.Emit(10);
+        Ray ray = kamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, zombiKatman))
+        {
+            hit.collider.gameObject.GetComponent<Zombi>().HasarAl();
+        }
+    }
+
+    public float GetSarjor()
+    {
+        return sarjor;
+    }
+    public float GetCephane()
+    {
+        return cephane;
+    }
+}
+
+================================================================================
+5. ZOMBİ AI SCRIPTİ (Zombi.cs)
+================================================================================
+Konum: Assets/zombi/Kodlar/Zombi.cs
+
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using static UnityEngine.Random;
+using UnityEngine.AI;
+
+public class Zombi : MonoBehaviour
+{
+    public float zombiHP = 100;
+    Animator zombiAnim;
+    bool zombiOlu;
+    public float kovalamaMesafesi;
+    public float saldirmaMesafesi;
+    float mesafe;
+    public NavMeshAgent zombiNav;
+    public GameObject hedefOyuncu;
+
+    public AudioSource audioSource_Ambient; 
+    public AudioSource audioSource_Actions; 
+
+    public AudioClip attackingSound;
+    public AudioClip dyingSound;
+ 
+
+    public Transform[] patrolPoints;
+    private int currentPatrolIndex;
+
+    void Start()
+    {
+        zombiAnim = this.GetComponent<Animator>();
+        hedefOyuncu = GameObject.FindGameObjectWithTag("SWAT");
+        zombiNav = this.GetComponent<NavMeshAgent>();
+
+        if (patrolPoints != null && patrolPoints.Length > 0)
+        {
+            currentPatrolIndex = 0;
+            zombiNav.SetDestination(patrolPoints[currentPatrolIndex].position);
+            zombiAnim.SetBool("isWalking", true);
+            if (audioSource_Actions != null && !audioSource_Actions.isPlaying)
+                audioSource_Actions.Play();
+        }
+        else
+        {
+            zombiAnim.SetBool("isWalking", false);
+            if (audioSource_Actions != null && audioSource_Actions.isPlaying)
+                audioSource_Actions.Stop();
+        }
+    }
+
+    void Update()
+    {
+        
+
+        
+        if (zombiHP <= 0 && zombiOlu == false)
+        {
+            zombiOlu = true; 
+
+            if (audioSource_Ambient != null && audioSource_Ambient.isPlaying)
+            {
+                audioSource_Ambient.Stop(); 
+            }
+            if (audioSource_Actions != null && audioSource_Actions.isPlaying)
+            {
+                audioSource_Actions.Stop(); 
+            }
+
+
+            zombiAnim.SetBool("isDead", true);
+            zombiAnim.SetBool("isAttacking", false);
+            zombiAnim.SetBool("isRunning", false);
+            zombiAnim.SetBool("isWalking", false);
+            zombiNav.isStopped = true;
+            StartCoroutine(YokOl());
+        }
+
+        if (zombiOlu == true)
+        {
+            return;
+        }
+
+
+        mesafe = Vector3.Distance(hedefOyuncu.transform.position, this.transform.position);
+
+        if (mesafe <= kovalamaMesafesi)
+        {
+            if (mesafe < saldirmaMesafesi)
+            {
+                // DURUM: SALDIRI
+                this.transform.LookAt(hedefOyuncu.transform.position);
+                zombiNav.isStopped = true;
+                zombiAnim.SetBool("isAttacking", true);
+                zombiAnim.SetBool("isRunning", false);
+                zombiAnim.SetBool("isWalking", false);
+            }
+            else
+            {
+                // DURUM: KOVALAMA (Running)
+                zombiNav.isStopped = false;
+                zombiNav.SetDestination(hedefOyuncu.transform.position);
+                this.transform.LookAt(hedefOyuncu.transform.position);
+                zombiAnim.SetBool("isRunning", true);
+                zombiAnim.SetBool("isAttacking", false);
+                zombiAnim.SetBool("isWalking", false);
+            }
+        }
+        else
+        {
+            zombiAnim.SetBool("isRunning", false);
+            zombiAnim.SetBool("isAttacking", false);
+
+            if (patrolPoints != null && patrolPoints.Length > 0)
+            {
+                zombiNav.isStopped = false;
+                zombiAnim.SetBool("isWalking", true);
+
+                if (!zombiNav.pathPending && zombiNav.remainingDistance <= zombiNav.stoppingDistance)
+                {
+                    currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+                    zombiNav.SetDestination(patrolPoints[currentPatrolIndex].position);
+                }
+            }
+            else
+            {
+                zombiNav.isStopped = true;
+                zombiAnim.SetBool("isWalking", false);
+            }
+        }
+
+        if (audioSource_Actions != null)
+        {
+            if (zombiAnim.GetBool("isRunning") || zombiAnim.GetBool("isWalking"))
+            {
+                if (!audioSource_Actions.isPlaying)
+                {
+                    audioSource_Actions.Play();
+                }
+            }
+            else
+            {
+                if (audioSource_Actions.isPlaying)
+                {
+                    audioSource_Actions.Stop();
+                }
+            }
+        }
+    }
+
+    public void zombiOlduSes()
+    {
+ 
+            audioSource_Actions.PlayOneShot(dyingSound);
+        
+    }
+    
+
+    public void hasarVerSes()
+    {
+        if (!audioSource_Actions.isPlaying)
+        {
+            audioSource_Actions.Play();
+        }
+        audioSource_Actions.PlayOneShot(attackingSound);
+
+    }
+    
+    public void hasarVer()
+    {
+        hedefOyuncu.GetComponent<KarakterKontrol>().HasarAl();
+    }
+
+    IEnumerator YokOl()
+    {
+        yield return new WaitForSeconds(5);
+        Destroy(this.gameObject);
+    }
+
+    public void HasarAl()
+    {
+        zombiHP -= Random.Range(15, 25);
+    }
+}
+
+================================================================================
+6. OYUN YÖNETİCİSİ SCRIPTİ (GameManager.cs)
+================================================================================
+Konum: Assets/BountyHunter_RIO/Scene/Huseyin/GameManager.cs
+
+using UnityEngine.SceneManagement;
+using UnityEngine;
+
+public class GameManager : MonoBehaviour
+{
+    public GameObject oyunBittiEkrani;
+    public bool oyunBittiMi = false;
+
+    
+    void Update()
+    {
+        // Test için p ye basınca bitir
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            OyuncuOldu();
+        }
+    }
+
+    public void OyuncuOldu()
+    {
+        if (oyunBittiMi == true)
+        {
+            return;
+        }
+        
+        oyunBittiMi = true;
+
+        Time.timeScale = 0f;
+        oyunBittiEkrani.SetActive(true); 
+        
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void YenidenBasla()
+    {
+        Time.timeScale = 1f; 
+        SceneManager.LoadScene("AnaOyun");
+    }
+}
+
+================================================================================
+7. KAKTÜS YERLEŞTİRİCİ SCRIPTİ (CactusPlacer.cs)
+================================================================================
+Konum: Assets/BountyHunter_RIO/Scene/Huseyin/CactusPlacer.cs
+
+using UnityEngine;
+
+public class CactusPlacer : MonoBehaviour
+{   private int countPerPrefab = 30;
+    private Vector2 mapSize = new Vector2(660, 660);
+    public GameObject[] cactusPrefabs;  
+    [ContextMenu("Kaktüsleri Yerleştir")]
+    public void PlaceCacti()
+    { 
+        foreach (GameObject cactusPrefab in cactusPrefabs)
+        {
+            for (int i = 0; i < countPerPrefab; i++)
+            {
+                float randomX = Random.Range(-mapSize.x / 2, mapSize.x / 2);
+                float randomZ = Random.Range(-mapSize.y / 2, mapSize.y / 2);
+                Vector3 spawnPosition = new Vector3(
+                    transform.position.x + randomX, 
+                    transform.position.y + 100f, 
+                    transform.position.z + randomZ
+                );
+
+                RaycastHit hit;
+                if (Physics.Raycast(spawnPosition, Vector3.down, out hit, 200f))
+                {
+                    GameObject cactus = Instantiate(cactusPrefab, hit.point, Quaternion.identity);
+                }
+            }
+        }
+    }
+}
+
+================================================================================
+                            SCRIPT AÇIKLAMALARI
+================================================================================
+BU SCRİPTLER YAZILIRKEN https://www.youtube.com/@ka6an/playlists YOUTUBE KANALI TPS OYUN YAPIMI OYNATMA LİSTESİNDEN İLHAM ALDIK.****
+1. ArayuzKontrol.cs:
+   - Oyun içi UI elementlerini yönetir
+   - Mermi ve sağlık bilgilerini ekranda gösterir
+   - SWAT tag'li oyuncu karakterini bulur ve bilgilerini alır
+
+2. KarakterKontrol.cs:
+   - Oyuncu karakterinin hareket mekaniklerini yönetir
+   - HP (sağlık) sistemini kontrol eder
+   - Zıplama, çömelme ve nişan alma mekaniklerini içerir
+   - Kamera FOV ayarlarını yönetir
+
+3. KameraKontrol.cs:
+   - TPS (Third Person Shooter) kamera sistemini yönetir
+   - Fare hareketlerine göre kamera rotasyonunu ayarlar
+   - Karakteri takip eder ve yumuşak geçişler sağlar
+   - Kamera açı sınırlamaları yapar
+
+4. AtesSistemi.cs:
+   - Ateş etme mekaniğini yönetir
+   - Raycast tabanlı hasar sistemi kullanır
+   - Sarjor ve cephane yönetimi yapar
+   - Muzzle flash efektlerini kontrol eder
+   - Ateş etme aralığı kontrolü yapar
+
+5. Zombi.cs:
+   - Zombi AI sistemini yönetir
+   - Finite State Machine (FSM) kullanır
+   - NavMesh pathfinding ile navigasyon sağlar
+   - Devriye (patrol) sistemi içerir
+   - İki kaynaklı ses sistemi kullanır
+   - Kovalama, saldırma ve devriye durumlarını yönetir
+
+6. GameManager.cs:
+   - Oyun durumunu yönetir
+   - Oyun bitiş ekranını kontrol eder
+   - Sahne yönetimi yapar
+   - Cursor kontrolü sağlar
+
+7. CactusPlacer.cs:
+   - Procedural dekorasyon yerleştirme sistemi
+   - Raycast kullanarak yüzey tespiti yapar
+   - Rastgele pozisyonlarda kaktüs yerleştirir
+   - Harita boyutuna göre otomatik yerleştirme yapar
+
+================================================================================
+                            KULLANILAN TEKNOLOJİLER
+================================================================================
+
+- Unity Engine 6000.2.10f1
+- C# Programlama Dili
+- NavMesh Pathfinding
+- Finite State Machine (FSM)
+- Component-Based Architecture
+- Raycast-Based Combat System
+- Animation System
+- Audio System (Dual-Source)
+- Procedural Generation
+
+================================================================================
+                            EKİP ÜYELERİ
+================================================================================
+
+- Efekan Demir - AI Sistemleri, Combat Mekanikleri, Ses Yönetimi, Readme
+- Emirhan - Kamera Sistemleri, Karakter Kontrolü
+- Hüseyin - Harita Tasarımı, Dekorasyon, Optimizasyon
+
+================================================================================
+                            SON GÜNCELLEME
+================================================================================
+
+Tarih: 2024
+Unity Versiyonu: 6000.2.10f1
+Proje Durumu: Tamamlandı
+
+================================================================================
+
