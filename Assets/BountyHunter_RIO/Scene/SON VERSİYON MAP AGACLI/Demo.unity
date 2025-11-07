@@ -61483,11 +61483,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b1aa41deadda2d409d60fca2d2f903a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CactusPlacer
-  countPerPrefab: 0
   cactusPrefabs:
   - {fileID: 8671534715859772465, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
   - {fileID: 2414589089006436188, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
-  mapSize: {x: 660, y: 660}
 --- !u!1 &620087824
 GameObject:
   m_ObjectHideFlags: 0
@@ -115674,11 +115672,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b1aa41deadda2d409d60fca2d2f903a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CactusPlacer
-  countPerPrefab: 750
   cactusPrefabs:
   - {fileID: 8612419659826746767, guid: 4f46f06206c9b324c9ee9089d1b45e21, type: 3}
   - {fileID: 8612419659826746767, guid: 4f46f06206c9b324c9ee9089d1b45e21, type: 3}
-  mapSize: {x: 660, y: 660}
 --- !u!4 &1109233562
 Transform:
   m_ObjectHideFlags: 0
@@ -121930,7 +121926,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b1aa41deadda2d409d60fca2d2f903a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CactusPlacer
-  countPerPrefab: 600
   cactusPrefabs:
   - {fileID: 2172471636107800588, guid: 9f00871d1f1463b4ab58cd6bc7ef0b37, type: 3}
   - {fileID: 1577900651635755405, guid: 1afba03b96442e94483637e075919ebd, type: 3}
@@ -121939,7 +121934,6 @@ MonoBehaviour:
   - {fileID: 1090054125417444430, guid: 30bd39f54d732064c8891c4afbcad3bb, type: 3}
   - {fileID: 1090054125417444430, guid: 30bd39f54d732064c8891c4afbcad3bb, type: 3}
   - {fileID: 1090054125417444430, guid: 30bd39f54d732064c8891c4afbcad3bb, type: 3}
-  mapSize: {x: 660, y: 660}
 --- !u!1 &1148042562
 GameObject:
   m_ObjectHideFlags: 0
@@ -147006,7 +147000,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b1aa41deadda2d409d60fca2d2f903a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CactusPlacer
-  countPerPrefab: 30
   cactusPrefabs:
   - {fileID: 8612419659826746767, guid: 4f46f06206c9b324c9ee9089d1b45e21, type: 3}
   - {fileID: 1090054125417444430, guid: 30bd39f54d732064c8891c4afbcad3bb, type: 3}
@@ -147014,7 +147007,6 @@ MonoBehaviour:
   - {fileID: 8671534715859772465, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
   - {fileID: 1090054125417444430, guid: 30bd39f54d732064c8891c4afbcad3bb, type: 3}
   - {fileID: 2414589089006436188, guid: 589efb82e39695d4c8c9d3069a07fb5c, type: 3}
-  mapSize: {x: 100, y: 100}
 --- !u!4 &1377509568
 Transform:
   m_ObjectHideFlags: 0
