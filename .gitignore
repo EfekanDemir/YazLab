@@ -28,13 +28,6 @@
 ehthumbs.db
 Thumbs.db
 
-# Build çıktıları (Oyunun çalıştırılabilir dosyaları)
-*.apk
-*.aab
-*.unitypackage
-*.exe
-*.dll
-*.pdb
 
 # Crash logları ve diğer geçici dosyalar
 crash_*.log
